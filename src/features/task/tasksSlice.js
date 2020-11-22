@@ -28,10 +28,11 @@ export const postBulkTasks = createAsyncThunk('tasks/postTask', async (addedTask
   return response.data
 })
 
-export const updateTask = createAsyncThunk('task/TaskUpdated', async (updatedTaskId) => {
+export const updateTask = createAsyncThunk('task/TaskUpdated', async (updatedTask) => {
   const response = await axios({
-    method:'PUT',
-    url: `http://127.0.0.1:8000/api/tasks/${updatedTaskId}/`
+    method:'put',
+    url: `http://127.0.0.1:8000/api/tasks/${updatedTask.id}/`,
+    data: updatedTask.data
   })
 })
 

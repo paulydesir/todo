@@ -2,43 +2,50 @@ import React,{useRef} from 'react';
 import {Grid,Select,FormControlLabel,Box} from '@material-ui/core';
 import { Formik, Form, Field,FieldArray } from 'formik';
 import {selectAllGoals} from '../goal/goalsSlice';
-import {postBulkTasks,taskAdded} from './tasksSlice'
+import {postBulkTasks,taskAdded,selectTaskById,updateTask} from './tasksSlice'
 import {useSelector,useDispatch} from 'react-redux';
 import MuiTextField from '@material-ui/core/TextField';
 import { TextField,Checkbox } from 'formik-material-ui'
 import {nanoid} from '@reduxjs/toolkit'
-import {Debug} from '../forms/Debug'
-import {selectTaskById} from './tasksSlice'
+// import {Debug} from '../forms/Debug'
 
 import {
     Autocomplete,
   } from 'formik-material-ui-lab';
 
-export const AddTaskForm = ({id}) => {  
+export const AddTaskForm = ({id,visible}) => {  
     // const today = new Date()
     let task = useSelector((state) => selectTaskById(state, id))
     const dispatch = useDispatch();
 
     const formRef = useRef();
+    
     const handleKeyDown = async (e) => {
-        // If the user pressed the Enter key:
         if (e.which === 13) {
-          // Create and dispatch the thunk function itself
-        //   setStatus('loading')
-        await dispatch(postBulkTasks(formRef.current.values.tasks))
-        const taskId = nanoid();
-        let task = formRef.current.values.tasks[0];
-        task.id = taskId;
-            dispatch(taskAdded({
-                id:taskId,
-                entity: task
-            }))
-          // And clear out the text input
+            
+            //Post Task
+            if(task === undefined) {  
+                await dispatch(postBulkTasks(formRef.current.values.tasks))
+            
+                const taskId = nanoid();
+                let task = formRef.current.values.tasks[0];
+                task.id = taskId;
+                dispatch(taskAdded({
+                    id:taskId,
+                    entity: task
+                }))
+            // And clear out the text input
+            }
+
+            if (task){
+                let data = formRef.current.values.tasks[0];
+                await dispatch(updateTask({id: task.id, data: data})) 
+            }
+
         }
       }
     
       let initialTask = {};
-
       const tasks  = Object.assign(initialTask, task ? 
         {
             title: task.title,
@@ -55,10 +62,6 @@ export const AddTaskForm = ({id}) => {
             parent: '',
             tags: []
         })
-
-
-      
-        
     return (
         <Grid item xs = {12}>
         <Formik initialValues = {
@@ -70,8 +73,14 @@ export const AddTaskForm = ({id}) => {
          }
         onSubmit = {(values,{setSubmitting})=> {
                 setTimeout(()=>{
-                    setSubmitting(false);
-                },600)
+                    setSubmitting(false);                    
+                    
+                    //update Task
+                    if (task){
+                        visible();
+                        
+                    }
+                },100)
             }}
             innerRef={formRef}
             >
@@ -153,7 +162,7 @@ export const AddTaskForm = ({id}) => {
                         </Grid> */}
                      </Grid>
                 </Box>
-                <Debug/>
+                {/* <Debug/> */}
             </Form>
         )}
         </Formik>

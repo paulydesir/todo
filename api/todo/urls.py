@@ -1,6 +1,6 @@
-from django.urls import path, include
+from django.urls import path, include,re_path
 from rest_framework.routers import DefaultRouter
-from todo.views import ReflectionViewSet,GoalBulkViewSet,TaskBulkViewSet,ThemeViewSet
+from todo.views import ReflectionViewSet,GoalBulkViewSet,TaskBulkViewSet,ThemeViewSet,TaskFilterList
 from rest_framework_bulk.routes import BulkRouter
 
 # Create a router and register our viewsets with it.
@@ -20,5 +20,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('',include(b_router.urls)),
     # path('goals/children/<id>/', GoalChildrendetail.as_view({'get':'list'}), name='goalChildren_detail'),
+    re_path('^filters/tasks/parents/', TaskFilterList.as_view()),
 
 ]
